@@ -25,8 +25,9 @@ class DetailsScreen extends StatefulWidget {
 
 class _DetailsScreenState extends State<DetailsScreen> {
   late Map<String, String> editableFields;
-  Map<String, bool> editingStates = {};
+  Map<String, String> fieldPlaceholders = {};
   Map<String, TextEditingController> controllers = {};
+  String? editingField; // Keeps track of the currently editing field
   bool hasChanges = false;
 
   @override
@@ -42,10 +43,9 @@ class _DetailsScreenState extends State<DetailsScreen> {
       'Address': widget.businessCard.address,
     };
 
-    // Initialize controllers for each field
     editableFields.forEach((key, value) {
       controllers[key] = TextEditingController(text: value);
-      editingStates[key] = false;
+      fieldPlaceholders[key] = value.isEmpty ? 'Not available' : value;
     });
   }
 
@@ -96,52 +96,21 @@ class _DetailsScreenState extends State<DetailsScreen> {
       appBar: AppBar(
         title: Text(
           'Business Card Details',
-          style: TextStyle(
-            fontWeight: FontWeight.bold,
-            fontSize: 19.0, // Adjust the font size as needed
-          ),
+          style: TextStyle(fontWeight: FontWeight.bold, fontSize: 19.0),
         ),
         actions: [
-          // Uncomment the following line if you want to conditionally display the save button
-          // if (!widget.isFromHistory)
-          IconButton(
-            icon: Icon(Icons.save),
-            onPressed: () async {
-              try {
-                // Save the business card details
-                await widget.storageService.saveBusinessCard(
-                  widget.businessCard,
-                  widget.imageFile,
-                );
-
-                // Show success message
-                ScaffoldMessenger.of(context).showSnackBar(
-                  SnackBar(content: Text('Business card saved successfully')),
-                );
-
-                // Navigate back after saving
-                Navigator.pop(context);
-              } catch (e) {
-                // Show error message on failure
-                ScaffoldMessenger.of(context).showSnackBar(
-                  SnackBar(content: Text('Failed to save business card')),
-                );
-              }
-            },
-          ),
-          // Show the check button only if there are changes
           if (hasChanges)
             IconButton(
               icon: Icon(Icons.check),
-              onPressed: saveChanges, // Call the saveChanges method
+              onPressed: saveChanges,
             ),
         ],
       ),
       body: SingleChildScrollView(
         child: Column(
           children: [
-            _buildImageSection(), // Build the image section
-            _buildDetailsSection(), // Build the details section
+            _buildImageSection(),
+            _buildDetailsSection(),
           ],
         ),
       ),
@@ -176,17 +145,6 @@ class _DetailsScreenState extends State<DetailsScreen> {
   Widget _buildDetailsSection() {
     return Container(
       margin: EdgeInsets.symmetric(horizontal: 16),
-      decoration: BoxDecoration(
-        color: Colors.white,
-        borderRadius: BorderRadius.circular(12),
-        boxShadow: [
-          BoxShadow(
-            color: Colors.black.withOpacity(0.1),
-            blurRadius: 4,
-            offset: Offset(0, 2),
-          ),
-        ],
-      ),
       child: Column(
         children: editableFields.keys
             .map((field) => _buildEditableField(field))
@@ -196,101 +154,79 @@ class _DetailsScreenState extends State<DetailsScreen> {
   }
 
   Widget _buildEditableField(String field) {
-    final bool isEditing = editingStates[field] ?? false;
+    final isEditing = editingField == field;
     final controller = controllers[field]!;
-    final IconData fieldIcon = _getFieldIcon(field);
+    final fieldIcon = _getFieldIcon(field);
 
-    return Container(
-      padding: EdgeInsets.symmetric(horizontal: 16, vertical: 12),
-      decoration: BoxDecoration(
-        border: Border(
-          bottom: BorderSide(
-            color: Colors.grey.withOpacity(0.2),
-          ),
+    return GestureDetector(
+      onTap: () {
+        setState(() {
+          editingField = field;
+        });
+      },
+      child: Container(
+        margin: EdgeInsets.only(bottom: 12),
+        padding: EdgeInsets.symmetric(horizontal: 16, vertical: 20),
+        decoration: BoxDecoration(
+          color: Colors.white,
+          borderRadius: BorderRadius.circular(12),
+          boxShadow: [
+            BoxShadow(
+              color: Colors.black.withOpacity(0.1),
+              blurRadius: 4,
+              offset: Offset(0, 2),
+            ),
+          ],
         ),
-      ),
-      child: Column(
-        crossAxisAlignment: CrossAxisAlignment.start,
-        children: [
-          Row(
-            children: [
-              Icon(fieldIcon, size: 20, color: Colors.blue),
-              SizedBox(width: 8),
-              Text(
-                field,
-                style: TextStyle(
-                  fontSize: 14,
-                  color: Colors.grey[600],
+        child: Column(
+          crossAxisAlignment: CrossAxisAlignment.start,
+          children: [
+            Row(
+              children: [
+                Icon(fieldIcon, size: 20, color: Colors.black),
+                SizedBox(width: 8),
+                Text(
+                  field,
+                  style: TextStyle(
+                    fontSize: 15,
+                    color: Colors.black,
+                    fontWeight: FontWeight.bold,
+                  ),
                 ),
-              ),
-            ],
-          ),
-          SizedBox(height: 8),
-          Row(
-            children: [
-              Expanded(
-                child: isEditing
-                    ? TextField(
-                        controller: controller,
-                        decoration: InputDecoration(
-                          isDense: true,
-                          contentPadding: EdgeInsets.symmetric(vertical: 8),
-                          border: UnderlineInputBorder(),
-                        ),
-                        onChanged: (value) {
-                          setState(() {
-                            hasChanges = true;
-                          });
-                        },
-                      )
-                    : Text(
-                        controller.text.isEmpty
-                            ? 'Not available'
-                            : controller.text,
-                        style: TextStyle(
-                          fontSize: 16,
-                          color: controller.text.isEmpty
-                              ? Colors.grey
-                              : Colors.black87,
-                        ),
-                      ),
-              ),
-              SizedBox(width: 8),
-              IconButton(
-                icon: Icon(
-                  isEditing ? Icons.check : Icons.edit,
-                  size: 20,
-                  color: Colors.blue,
-                ),
-                onPressed: () {
-                  setState(() {
-                    editingStates[field] = !isEditing;
-                    if (!isEditing) {
-                      // If starting to edit, do nothing
-                    } else {
-                      // If finishing edit, update the field
-                      editableFields[field] = controller.text;
-                      hasChanges = true;
-                    }
-                  });
-                },
-              ),
-              if (controller.text.isNotEmpty && !isEditing)
-                IconButton(
-                  icon: Icon(Icons.copy, size: 20),
-                  onPressed: () {
-                    Clipboard.setData(ClipboardData(text: controller.text));
-                    ScaffoldMessenger.of(context).showSnackBar(
-                      SnackBar(
-                        content: Text('Copied to clipboard'),
-                        duration: Duration(seconds: 2),
-                      ),
-                    );
-                  },
-                ),
-            ],
-          ),
-        ],
+              ],
+            ),
+            SizedBox(height: 8),
+            isEditing
+                ? TextField(
+                    controller: controller,
+                    autofocus: true,
+                    decoration: InputDecoration(
+                      isDense: true,
+                      contentPadding: EdgeInsets.symmetric(vertical: 8),
+                      border: UnderlineInputBorder(),
+                    ),
+                    onChanged: (_) {
+                      setState(() {
+                        hasChanges = true;
+                      });
+                    },
+                    onSubmitted: (_) {
+                      setState(() {
+                        editingField = null;
+                      });
+                    },
+                  )
+                : Text(
+                    controller.text.isEmpty ? 'Not available' : controller.text,
+                    style: TextStyle(
+                      fontSize: 16,
+                      color: controller.text.isEmpty
+                          ? Colors.grey
+                          : Colors.black87,
+                    ),
+                  ),
+          ],
+        ),
       ),
     );
   }

@@ -1,4 +1,6 @@
+import 'package:card_scanner/screens/media.dart';
 import 'package:card_scanner/screens/report.dart';
+import 'package:card_scanner/screens/team.dart';
 import 'package:flutter/material.dart';
 
 import '../services/storage.dart';
@@ -22,8 +24,8 @@ class _MyHomePageState extends State<MyHomePage> {
     super.initState();
     _pages = [
       ReportScreen(storageService: widget.storageService),
-      MediaPage(),
-      TeamPage(),
+      Media(),
+      Team(),
     ];
   }
 
