@@ -73,7 +73,8 @@ class _DetailsScreenState extends State<DetailsScreen> {
         dateAdded: widget.businessCard.dateAdded,
       );
 
-      await widget.storageService.updateBusinessCard(widget.businessCard, updatedCard);
+      await widget.storageService
+          .updateBusinessCard(widget.businessCard, updatedCard);
 
       ScaffoldMessenger.of(context).showSnackBar(
         SnackBar(content: Text('Changes saved successfully')),
@@ -93,40 +94,54 @@ class _DetailsScreenState extends State<DetailsScreen> {
   Widget build(BuildContext context) {
     return Scaffold(
       appBar: AppBar(
-        title: Text('Business Card Details'),
+        title: Text(
+          'Business Card Details',
+          style: TextStyle(
+            fontWeight: FontWeight.bold,
+            fontSize: 19.0, // Adjust the font size as needed
+          ),
+        ),
         actions: [
-         // if (!widget.isFromHistory)
-            IconButton(
-              icon: Icon(Icons.save),
-              onPressed: () async {
-                try {
-                  await widget.storageService.saveBusinessCard(
-                    widget.businessCard,
-                    widget.imageFile,
-                  );
-                  ScaffoldMessenger.of(context).showSnackBar(
-                    SnackBar(content: Text('Business card saved successfully')),
-                  );
-                  Navigator.pop(context);
-                } catch (e) {
-                  ScaffoldMessenger.of(context).showSnackBar(
-                    SnackBar(content: Text('Failed to save business card')),
-                  );
-                }
-              },
-            ),
+          // Uncomment the following line if you want to conditionally display the save button
+          // if (!widget.isFromHistory)
+          IconButton(
+            icon: Icon(Icons.save),
+            onPressed: () async {
+              try {
+                // Save the business card details
+                await widget.storageService.saveBusinessCard(
+                  widget.businessCard,
+                  widget.imageFile,
+                );
+
+                // Show success message
+                ScaffoldMessenger.of(context).showSnackBar(
+                  SnackBar(content: Text('Business card saved successfully')),
+                );
+
+                // Navigate back after saving
+                Navigator.pop(context);
+              } catch (e) {
+                // Show error message on failure
+                ScaffoldMessenger.of(context).showSnackBar(
+                  SnackBar(content: Text('Failed to save business card')),
+                );
+              }
+            },
+          ),
+          // Show the check button only if there are changes
           if (hasChanges)
             IconButton(
               icon: Icon(Icons.check),
-              onPressed: saveChanges,
+              onPressed: saveChanges, // Call the saveChanges method
             ),
         ],
       ),
       body: SingleChildScrollView(
         child: Column(
           children: [
-            _buildImageSection(),
-            _buildDetailsSection(),
+            _buildImageSection(), // Build the image section
+            _buildDetailsSection(), // Build the details section
           ],
         ),
       ),
@@ -173,7 +188,9 @@ class _DetailsScreenState extends State<DetailsScreen> {
         ],
       ),
       child: Column(
-        children: editableFields.keys.map((field) => _buildEditableField(field)).toList(),
+        children: editableFields.keys
+            .map((field) => _buildEditableField(field))
+            .toList(),
       ),
     );
   }
@@ -214,25 +231,29 @@ class _DetailsScreenState extends State<DetailsScreen> {
               Expanded(
                 child: isEditing
                     ? TextField(
-                  controller: controller,
-                  decoration: InputDecoration(
-                    isDense: true,
-                    contentPadding: EdgeInsets.symmetric(vertical: 8),
-                    border: UnderlineInputBorder(),
-                  ),
-                  onChanged: (value) {
-                    setState(() {
-                      hasChanges = true;
-                    });
-                  },
-                )
+                        controller: controller,
+                        decoration: InputDecoration(
+                          isDense: true,
+                          contentPadding: EdgeInsets.symmetric(vertical: 8),
+                          border: UnderlineInputBorder(),
+                        ),
+                        onChanged: (value) {
+                          setState(() {
+                            hasChanges = true;
+                          });
+                        },
+                      )
                     : Text(
-                  controller.text.isEmpty ? 'Not available' : controller.text,
-                  style: TextStyle(
-                    fontSize: 16,
-                    color: controller.text.isEmpty ? Colors.grey : Colors.black87,
-                  ),
-                ),
+                        controller.text.isEmpty
+                            ? 'Not available'
+                            : controller.text,
+                        style: TextStyle(
+                          fontSize: 16,
+                          color: controller.text.isEmpty
+                              ? Colors.grey
+                              : Colors.black87,
+                        ),
+                      ),
               ),
               SizedBox(width: 8),
               IconButton(

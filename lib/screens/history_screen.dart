@@ -9,7 +9,8 @@ import 'detaisl_screen.dart';
 class HistoryScreen extends StatelessWidget {
   final StorageService storageService;
 
-  const HistoryScreen({Key? key, required this.storageService}) : super(key: key);
+  const HistoryScreen({Key? key, required this.storageService})
+      : super(key: key);
 
   @override
   Widget build(BuildContext context) {
@@ -17,23 +18,29 @@ class HistoryScreen extends StatelessWidget {
 
     return Scaffold(
       appBar: AppBar(
-        title: Text('Saved Business Cards'),
+        title: Text(
+          'Saved Business Cards',
+          style: TextStyle(
+            fontWeight: FontWeight.bold,
+            fontSize: 19.0, // Adjust the size as needed
+          ),
+        ),
       ),
       body: cards.isEmpty
           ? Center(
-        child: Text(
-          'No saved business cards',
-          style: TextStyle(fontSize: 16, color: Colors.grey),
-        ),
-      )
+              child: Text(
+                'No saved business cards',
+                style: TextStyle(fontSize: 16, color: Colors.grey),
+              ),
+            )
           : ListView.builder(
-        itemCount: cards.length,
-        padding: EdgeInsets.all(8),
-        itemBuilder: (context, index) {
-          final card = cards[index];
-          return _buildCardItem(context, card);
-        },
-      ),
+              itemCount: cards.length,
+              padding: EdgeInsets.all(8),
+              itemBuilder: (context, index) {
+                final card = cards[index];
+                return _buildCardItem(context, card);
+              },
+            ),
     );
   }
 
@@ -111,7 +118,7 @@ class HistoryScreen extends StatelessWidget {
               ),
               // Delete Button
               IconButton(
-                icon: Icon(Icons.delete_outline, color: Colors.red),
+                icon: Icon(Icons.delete_outline, color: Colors.black),
                 onPressed: () {
                   _showDeleteConfirmation(context, card);
                 },
