@@ -5,10 +5,12 @@ import '../services/storage.dart';
 
 class ReportScreen extends StatefulWidget {
   final StorageService storageService;
-  const ReportScreen({Key? key, required this.storageService}) : super(key: key);
+  const ReportScreen({Key? key, required this.storageService})
+      : super(key: key);
   @override
   _ReportScreenState createState() => _ReportScreenState();
 }
+
 class _ReportScreenState extends State<ReportScreen> {
   @override
   Widget build(BuildContext context) {
@@ -42,19 +44,21 @@ class _ReportScreenState extends State<ReportScreen> {
                 _buildGridOption(
                   context,
                   icon: Icons.camera_alt,
-                  label: "Scan business card",
+                  label: "Scan card",
                   onTap: () {
                     // Navigate directly to CameraScreen
                     Navigator.push(
                       context,
-                      MaterialPageRoute(builder: (context) => CameraScreen(storageService: widget.storageService)),
+                      MaterialPageRoute(
+                          builder: (context) => CameraScreen(
+                              storageService: widget.storageService)),
                     );
                   },
                 ),
                 _buildGridOption(
                   context,
                   icon: Icons.credit_card,
-                  label: "Scan NFC tag",
+                  label: "Scan NFC",
                   onTap: () {
                     ScaffoldMessenger.of(context).showSnackBar(
                       SnackBar(content: Text("Scan NFC feature coming soon")),
@@ -64,7 +68,7 @@ class _ReportScreenState extends State<ReportScreen> {
                 _buildGridOption(
                   context,
                   icon: Icons.qr_code_scanner,
-                  label: "Scan QR code or badge",
+                  label: "Scan QR",
                   onTap: () {
                     ScaffoldMessenger.of(context).showSnackBar(
                       SnackBar(
@@ -75,7 +79,7 @@ class _ReportScreenState extends State<ReportScreen> {
                 _buildGridOption(
                   context,
                   icon: Icons.edit,
-                  label: "Add manually",
+                  label: "Manually",
                   onTap: () {
                     ScaffoldMessenger.of(context).showSnackBar(
                       SnackBar(content: Text("Working on that...")),
