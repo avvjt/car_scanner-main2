@@ -23,20 +23,25 @@ class CameraService {
     final image = await controller!.takePicture();
     final croppedFile = await ImageCropper().cropImage(
       sourcePath: image.path,
-      aspectRatioPresets: [
-        CropAspectRatioPreset.original,
-        CropAspectRatioPreset.ratio4x3,
-        CropAspectRatioPreset.ratio16x9,
-      ],
       uiSettings: [
         AndroidUiSettings(
           toolbarTitle: 'Want to crop?',
           toolbarColor: Colors.white,
           toolbarWidgetColor: Colors.black,
           lockAspectRatio: false,
+          aspectRatioPresets: [
+            CropAspectRatioPreset.original,
+            CropAspectRatioPreset.ratio4x3,
+            CropAspectRatioPreset.ratio16x9,
+          ],
         ),
         IOSUiSettings(
           title: 'Want to crop?',
+          aspectRatioPresets: [
+            CropAspectRatioPreset.original,
+            CropAspectRatioPreset.ratio4x3,
+            CropAspectRatioPreset.ratio16x9,
+          ],
         ),
       ],
     );
