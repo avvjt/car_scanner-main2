@@ -1,20 +1,16 @@
 // lib/main.dart
 import 'package:card_scanner/screens/bottom_navigation.dart';
-import 'package:card_scanner/services/storage.dart';
 
 import 'package:flutter/material.dart';
 
 void main() async {
   WidgetsFlutterBinding.ensureInitialized();
-  final storageService = StorageService();
-  await storageService.initialize();
-  runApp(BusinessCardScannerApp(storageService: storageService));
+  runApp(BusinessCardScannerApp());
 }
 
 class BusinessCardScannerApp extends StatelessWidget {
-  final StorageService storageService;
 
-  const BusinessCardScannerApp({Key? key, required this.storageService})
+  const BusinessCardScannerApp({Key? key})
       : super(key: key);
   @override
   Widget build(BuildContext context) {
@@ -23,7 +19,7 @@ class BusinessCardScannerApp extends StatelessWidget {
       theme: ThemeData(
         primarySwatch: Colors.blue,
       ),
-      home: MyHomePage(storageService: storageService),
+      home: MyHomePage(),
     );
   }
 }

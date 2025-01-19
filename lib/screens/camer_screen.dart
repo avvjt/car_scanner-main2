@@ -8,11 +8,8 @@ import '../widegts/camera_overlays.dart';
 import 'detaisl_screen.dart';
 
 class CameraScreen extends StatefulWidget {
-  final StorageService storageService;
-
   const CameraScreen({
     Key? key,
-    required this.storageService,
   }) : super(key: key);
 
   @override
@@ -49,14 +46,15 @@ class _CameraScreenState extends State<CameraScreen> {
             await _textRecognitionService.processImage(imageFile);
         if (!mounted) return;
 
+        ///StorageService _service = StorageService();
+        ///await _service.saveBusinessCard(businessCard, imageFile);
         Navigator.push(
           context,
           MaterialPageRoute(
             builder: (context) => DetailsScreen(
-              businessCard: businessCard,
               imageFile: imageFile,
-              isFromHistory: true,
-              storageService: widget.storageService,
+              isFromHistory: false,
+              businessCard: businessCard,
             ),
           ),
         );

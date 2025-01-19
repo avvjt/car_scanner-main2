@@ -1,21 +1,38 @@
+import 'package:card_scanner/models/business_card_model.dart';
 import 'package:flutter/material.dart';
-import '../models/card.dart';
 import '../services/storage.dart';
 
 import 'dart:io';
 
 import 'detaisl_screen.dart';
 
-class HistoryScreen extends StatelessWidget {
-  final StorageService storageService;
-
-  const HistoryScreen({Key? key, required this.storageService})
-      : super(key: key);
+class HistoryScreen extends StatefulWidget {
+  const HistoryScreen({Key? key}) : super(key: key);
 
   @override
-  Widget build(BuildContext context) {
-    final cards = storageService.getAllBusinessCards();
+  State<HistoryScreen> createState() => _HistoryScreenState();
+}
 
+class _HistoryScreenState extends State<HistoryScreen> {
+  StorageService _service = StorageService();
+  @override
+  void initState() {
+    WidgetsBinding.instance.addPostFrameCallback((_) {
+      setState(() {
+        _getCards();
+      });
+    });
+    super.initState();
+  }
+
+  Future<void> _getCards() async {
+    cards = await _service.getAllBusinessCards();
+    setState(() {});
+  }
+
+  List<BusinessCardModel> cards = [];
+  @override
+  Widget build(BuildContext context) {
     return Scaffold(
       appBar: AppBar(
         title: Text(
@@ -44,22 +61,24 @@ class HistoryScreen extends StatelessWidget {
     );
   }
 
-  Widget _buildCardItem(BuildContext context, BusinessCard card) {
+  Widget _buildCardItem(BuildContext context, BusinessCardModel card) {
     return Card(
       margin: EdgeInsets.symmetric(vertical: 8, horizontal: 4),
       child: InkWell(
-        onTap: () {
-          Navigator.push(
+        onTap: () async {
+          await Navigator.push(
             context,
             MaterialPageRoute(
               builder: (context) => DetailsScreen(
                 businessCard: card,
-                imageFile: File(card.imagePath),
+                imageFile: File(card.imageFilePath),
                 isFromHistory: true,
-                storageService: storageService,
               ),
             ),
-          );
+          ).then((_) async {
+            await _getCards();
+            setState(() {});
+          });
         },
         child: Padding(
           padding: EdgeInsets.all(12),
@@ -69,7 +88,7 @@ class HistoryScreen extends StatelessWidget {
               ClipRRect(
                 borderRadius: BorderRadius.circular(8),
                 child: Image.file(
-                  File(card.imagePath),
+                  File(card.imageFilePath),
                   width: 80,
                   height: 80,
                   fit: BoxFit.cover,
@@ -107,7 +126,7 @@ class HistoryScreen extends StatelessWidget {
                     ],
                     SizedBox(height: 4),
                     Text(
-                      'Added: ${_formatDate(card.dateAdded)}',
+                      'Added: ${_formatDate(DateTime.parse(card.dateTime))}',
                       style: TextStyle(
                         fontSize: 12,
                         color: Colors.grey[500],
@@ -134,7 +153,7 @@ class HistoryScreen extends StatelessWidget {
     return '${date.day}/${date.month}/${date.year}';
   }
 
-  void _showDeleteConfirmation(BuildContext context, BusinessCard card) {
+  void _showDeleteConfirmation(BuildContext context, BusinessCardModel card) {
     showDialog(
       context: context,
       builder: (context) => AlertDialog(
@@ -147,17 +166,10 @@ class HistoryScreen extends StatelessWidget {
           ),
           TextButton(
             onPressed: () async {
-              await storageService.deleteBusinessCard(card);
-              Navigator.pop(context); // Close dialog
-              // Refresh the screen
-              Navigator.pushReplacement(
-                context,
-                MaterialPageRoute(
-                  builder: (context) => HistoryScreen(
-                    storageService: storageService,
-                  ),
-                ),
-              );
+              await _service.deleteBusinessCard(card);
+              Navigator.of(context).pop();
+              await _getCards();
+              setState(() {});
             },
             child: Text('Delete', style: TextStyle(color: Colors.red)),
           ),

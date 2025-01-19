@@ -3,12 +3,12 @@ import 'package:card_scanner/screens/report.dart';
 import 'package:card_scanner/screens/team.dart';
 import 'package:flutter/material.dart';
 
-import '../services/storage.dart';
 import 'history_screen.dart';
 
 class MyHomePage extends StatefulWidget {
-  final StorageService storageService;
-  const MyHomePage({Key? key, required this.storageService}) : super(key: key);
+  const MyHomePage({
+    Key? key,
+  }) : super(key: key);
   @override
   _MyHomePageState createState() => _MyHomePageState();
 }
@@ -23,7 +23,7 @@ class _MyHomePageState extends State<MyHomePage> {
   void initState() {
     super.initState();
     _pages = [
-      ReportScreen(storageService: widget.storageService),
+      ReportScreen(),
       Media(),
       Team(),
     ];
@@ -71,9 +71,7 @@ class _MyHomePageState extends State<MyHomePage> {
               Navigator.push(
                 context,
                 MaterialPageRoute(
-                  builder: (context) => HistoryScreen(
-                    storageService: widget.storageService,
-                  ),
+                  builder: (context) => HistoryScreen(),
                 ),
               );
             },

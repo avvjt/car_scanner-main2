@@ -1,33 +1,14 @@
-import 'package:hive_flutter/hive_flutter.dart';
+import 'dart:convert';
+
+import 'package:card_scanner/models/business_card_model.dart';
 import 'package:path_provider/path_provider.dart';
 import 'dart:io';
 import 'package:path/path.dart' as path;
-
-import '../models/card.dart';
-
+import 'package:shared_preferences/shared_preferences.dart';
+import 'package:uuid/uuid.dart';
 
 class StorageService {
-  static const String boxName = 'business_cards';
-  late Box<BusinessCard> _box;
-
-  Future<void> initialize() async {
-    final appDir = await getApplicationDocumentsDirectory();
-
-    // Create images directory if it doesn't exist
-    final imagesDir = Directory('${appDir.path}/images');
-    if (!await imagesDir.exists()) {
-      await imagesDir.create(recursive: true);
-    }
-
-    await Hive.initFlutter(appDir.path);
-
-    if (!Hive.isAdapterRegistered(0)) {
-      Hive.registerAdapter(BusinessCardAdapter());
-    }
-
-    _box = await Hive.openBox<BusinessCard>(boxName);
-  }
-
+  static const String businessCardKey = "business_card_data";
   Future<String> saveImage(File imageFile) async {
     try {
       final appDir = await getApplicationDocumentsDirectory();
@@ -44,11 +25,12 @@ class StorageService {
     }
   }
 
-  Future<void> saveBusinessCard(BusinessCard card, File imageFile) async {
+  Future<void> saveBusinessCard(BusinessCardModel card, File imageFile) async {
     try {
       final imagePath = await saveImage(imageFile);
 
-      final newCard = BusinessCard(
+      final newCard = BusinessCardModel(
+        id: const Uuid().v4(),
         name: card.name,
         company: card.company,
         email: card.email,
@@ -58,51 +40,69 @@ class StorageService {
         position: card.position,
         additionalPhones: card.additionalPhones,
         additionalEmails: card.additionalEmails,
-        imagePath: imagePath,
-        dateAdded: DateTime.now(),
+        imageFilePath: imagePath,
+        dateTime: DateTime.now().toIso8601String(),
+        example: card.example,
       );
-
-      await _box.add(newCard);
+      SharedPreferences prefs = await SharedPreferences.getInstance();
+      String cardData = jsonEncode(newCard.toJson());
+      List<String> ls = prefs.getStringList(businessCardKey) ?? [];
+      ls.add(cardData);
+      await prefs.setStringList(businessCardKey, ls);
     } catch (e) {
       print('Error saving business card: $e');
       throw Exception('Failed to save business card');
     }
   }
 
-  List<BusinessCard> getAllBusinessCards() {
+  Future<List<BusinessCardModel>> getAllBusinessCards() async {
     try {
-      return _box.values.toList().reversed.toList();
+      SharedPreferences prefs = await SharedPreferences.getInstance();
+      List<String> ls = prefs.getStringList(businessCardKey) ?? [];
+      List<BusinessCardModel> list = [];
+      for (String a in ls) {
+        list.add(BusinessCardModel.fromJson(json.decode(a)));
+      }
+      return list;
     } catch (e) {
       print('Error getting business cards: $e');
       return [];
     }
   }
 
-  Future<void> deleteBusinessCard(BusinessCard card) async {
+  Future<void> deleteBusinessCard(BusinessCardModel card) async {
     try {
       // Delete image file if it exists
-      if (card.imagePath.isNotEmpty) {
-        final imageFile = File(card.imagePath);
+      if (card.imageFilePath.isNotEmpty) {
+        final imageFile = File(card.imageFilePath);
         if (await imageFile.exists()) {
           await imageFile.delete();
         }
       }
+      List<BusinessCardModel> ls = await getAllBusinessCards();
+      ls.removeWhere((item) => item.id == card.id);
+      SharedPreferences prefs = await SharedPreferences.getInstance();
 
-      // Delete card from Hive
-      final index = _box.values.toList().indexOf(card);
-      if (index != -1) {
-        await _box.deleteAt(index);
-      }
+      await prefs.setStringList(
+          businessCardKey, businessCardModelListToString(ls));
     } catch (e) {
       print('Error deleting business card: $e');
       throw Exception('Failed to delete business card');
     }
   }
-  Future<void> updateBusinessCard(BusinessCard oldCard, BusinessCard newCard) async {
-    final box = Hive.box<BusinessCard>(boxName);
-    final index = box.values.toList().indexOf(oldCard);
-    if (index != -1) {
-      await box.putAt(index, newCard);
+
+  Future<void> updateBusinessCard(BusinessCardModel newCard) async {
+    try {
+      List<BusinessCardModel> ls = await getAllBusinessCards();
+
+     final index =  ls.indexWhere((item) => item.id == newCard.id);
+     ls[index] = newCard;
+     SharedPreferences prefs = await SharedPreferences.getInstance();
+
+      await prefs.setStringList(
+          businessCardKey, businessCardModelListToString(ls));
+    } catch (e) {
+      throw Exception('Failed to update business card');
     }
   }
 }

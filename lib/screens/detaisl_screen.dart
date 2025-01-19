@@ -1,22 +1,19 @@
+import 'package:card_scanner/models/business_card_model.dart';
+import 'package:card_scanner/services/storage.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
-import '../models/card.dart';
 import 'dart:io';
 
-import '../services/storage.dart';
-
 class DetailsScreen extends StatefulWidget {
-  final BusinessCard businessCard;
+  final BusinessCardModel businessCard;
   final File imageFile;
   final bool isFromHistory;
-  final StorageService storageService;
 
   const DetailsScreen({
     Key? key,
-    required this.businessCard,
     required this.imageFile,
     this.isFromHistory = false,
-    required this.storageService,
+    required this.businessCard,
   }) : super(key: key);
 
   @override
@@ -28,7 +25,8 @@ class _DetailsScreenState extends State<DetailsScreen> {
   Map<String, String> fieldPlaceholders = {};
   Map<String, TextEditingController> controllers = {};
   String? editingField; // Keeps track of the currently editing field
-  bool hasChanges = false;
+  bool hasChanges = true;
+  StorageService _service = StorageService();
 
   @override
   void initState() {
@@ -41,11 +39,25 @@ class _DetailsScreenState extends State<DetailsScreen> {
       'Phone': widget.businessCard.phone,
       'Website': widget.businessCard.website,
       'Address': widget.businessCard.address,
+      "Example": widget.businessCard.example,
     };
 
     editableFields.forEach((key, value) {
       controllers[key] = TextEditingController(text: value);
       fieldPlaceholders[key] = value.isEmpty ? 'Not available' : value;
+    });
+
+    initData();
+  }
+
+  initData() {
+    WidgetsBinding.instance.addPostFrameCallback((_) {
+      setState(() {
+        if (widget.isFromHistory) {
+          hasChanges = false;
+          setState(() {});
+        }
+      });
     });
   }
 
@@ -59,7 +71,8 @@ class _DetailsScreenState extends State<DetailsScreen> {
     if (!hasChanges) return;
 
     try {
-      final updatedCard = BusinessCard(
+      final updatedCard = BusinessCardModel(
+        id: widget.businessCard.id,
         name: controllers['Name']!.text,
         position: controllers['Position']!.text,
         company: controllers['Company']!.text,
@@ -67,15 +80,19 @@ class _DetailsScreenState extends State<DetailsScreen> {
         phone: controllers['Phone']!.text,
         website: controllers['Website']!.text,
         address: controllers['Address']!.text,
-        additionalPhones: widget.businessCard.additionalPhones,
-        additionalEmails: widget.businessCard.additionalEmails,
-        imagePath: widget.businessCard.imagePath,
-        dateAdded: widget.businessCard.dateAdded,
+        additionalPhones: widget.businessCard.additionalPhones ?? [],
+        additionalEmails: widget.businessCard.additionalEmails ?? [],
+        imageFilePath:
+            widget.isFromHistory ? widget.businessCard.imageFilePath ?? '' : "",
+        dateTime: DateTime.now().toIso8601String(),
+        example: controllers["Example"]!.text,
       );
 
-      await widget.storageService
-          .updateBusinessCard(widget.businessCard, updatedCard);
-
+      if (widget.isFromHistory) {
+        await _service.updateBusinessCard(updatedCard);
+      } else {
+        await _service.saveBusinessCard(updatedCard, widget.imageFile);
+      }
       ScaffoldMessenger.of(context).showSnackBar(
         SnackBar(content: Text('Changes saved successfully')),
       );

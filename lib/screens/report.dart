@@ -1,11 +1,9 @@
 import 'package:card_scanner/screens/camer_screen.dart';
 import 'package:flutter/material.dart';
 
-import '../services/storage.dart';
 
 class ReportScreen extends StatefulWidget {
-  final StorageService storageService;
-  const ReportScreen({Key? key, required this.storageService})
+  const ReportScreen({Key? key})
       : super(key: key);
   @override
   _ReportScreenState createState() => _ReportScreenState();
@@ -51,7 +49,7 @@ class _ReportScreenState extends State<ReportScreen> {
                       context,
                       MaterialPageRoute(
                           builder: (context) => CameraScreen(
-                              storageService: widget.storageService)),
+                          )),
                     );
                   },
                 ),
