@@ -157,6 +157,15 @@ class _HistoryScreenState extends State<HistoryScreen> {
                       )
                       .toList(),
                 ),
+
+              SizedBox(height: 4),
+              Text(
+                'Created: ${_formatDate(DateTime.parse(card.dateTime))}',
+                style: TextStyle(
+                  fontSize: 12,
+                  color: Colors.grey[500],
+                ),
+              ),
             ],
           ),
         ),

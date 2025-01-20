@@ -40,7 +40,8 @@ class _DetailsScreenState extends State<DetailsScreen> {
       'Phone': widget.businessCard.phone,
       'Website': widget.businessCard.website,
       'Address': widget.businessCard.address,
-      "Example": widget.businessCard.example,
+      "Note": widget.businessCard.note,
+      "Specification": widget.businessCard.specification,
     };
 
     checkboxValues = {
@@ -96,7 +97,8 @@ class _DetailsScreenState extends State<DetailsScreen> {
         imageFilePath:
             widget.isFromHistory ? widget.businessCard.imageFilePath ?? '' : "",
         dateTime: DateTime.now().toIso8601String(),
-        example: controllers["Example"]!.text,
+        note: controllers["Note"]!.text,
+        specification: controllers["Specification"]!.text,
 
         selectedFields: selectedFields, // Save selected fields
       );
@@ -310,6 +312,8 @@ class _DetailsScreenState extends State<DetailsScreen> {
         return Icons.language;
       case 'Address':
         return Icons.location_on;
+      case 'Note':
+        return Icons.note;
       default:
         return Icons.info;
     }

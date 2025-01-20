@@ -21,7 +21,8 @@ class CsvService {
       'Address',
       'Additional Phones',
       'Additional Emails',
-      'Example'
+      'Note'
+          'Specification'
     ]);
 
     // Add each business card as a row
@@ -38,7 +39,8 @@ class CsvService {
             .join('; '), // Join multiple phones with a separator
         card.additionalEmails
             .join('; '), // Join multiple emails with a separator
-        card.example
+        card.note,
+        card.specification,
       ]);
     }
 

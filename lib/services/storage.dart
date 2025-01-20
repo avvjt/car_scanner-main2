@@ -76,7 +76,8 @@ class StorageService {
         additionalEmails: card.additionalEmails,
         imageFilePath: imagePath,
         dateTime: DateTime.now().toIso8601String(),
-        example: card.example,
+        note: card.note,
+        specification: card.specification,
         selectedFields: card.selectedFields, // Include selectedFields here
       );
       SharedPreferences prefs = await SharedPreferences.getInstance();

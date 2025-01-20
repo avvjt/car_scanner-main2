@@ -14,7 +14,8 @@ class BusinessCardModel {
   final String address;
   final List<String> additionalPhones;
   final List<String> additionalEmails;
-  final String example;
+  final String note;
+  final String specification;
   final String imageFilePath;
   final String dateTime;
 
@@ -32,7 +33,8 @@ class BusinessCardModel {
     required this.address,
     required this.additionalPhones,
     required this.additionalEmails,
-    required this.example,
+    required this.note,
+    required this.specification,
     required this.imageFilePath,
     required this.dateTime,
     this.selectedFields = const [],
@@ -166,7 +168,8 @@ class BusinessCardModel {
       website: website,
       additionalPhones: phones.length > 1 ? phones.sublist(1) : [],
       additionalEmails: emails.length > 1 ? emails.sublist(1) : [],
-      example: "",
+      note: "",
+      specification: "",
       imageFilePath: '',
       dateTime: '',
     );
@@ -188,7 +191,8 @@ class BusinessCardModel {
         additionalEmails: json["additional_emails"] != null
             ? List<String>.from(json["additional_emails"].map((x) => x))
             : [],
-        example: json["example"] ?? " ",
+        note: json["note"] ?? " ",
+        specification: json["specification"] ?? " ",
         imageFilePath: json["image_file_path"] ?? " ",
         dateTime: json["date_time"] ?? " ",
         selectedFields: json["selected_fields"] != null
@@ -206,7 +210,8 @@ class BusinessCardModel {
         "address": address,
         "additional_phones": List<dynamic>.from(additionalPhones.map((x) => x)),
         "additional_emails": List<dynamic>.from(additionalEmails.map((x) => x)),
-        "example": example,
+        "note": note,
+        "specification": specification,
         "image_file_path": imageFilePath,
         "date_time": dateTime,
         "id": id,
