@@ -23,6 +23,20 @@ class DetailsScreen extends StatefulWidget {
 class _DetailsScreenState extends State<DetailsScreen> {
   late Map<String, String> editableFields;
   late Map<String, bool> checkboxValues;
+
+  // Map for custom checkbox display names
+  Map<String, String> checkboxDisplayNames = {
+    'Name': 'Turning',
+    'Position': 'Milling',
+    'Company': 'Boring',
+    'Email': 'Threading',
+    'Phone': 'MBU',
+    'Website': 'EBB',
+    'Address': 'Boring Kit',
+    'Note': 'Holder Kit',
+    'Specification': 'Facing Head Kit',
+  };
+
   Map<String, String> fieldPlaceholders = {};
   Map<String, TextEditingController> controllers = {};
   String? editingField; // Keeps track of the currently editing field
@@ -281,7 +295,8 @@ class _DetailsScreenState extends State<DetailsScreen> {
           Column(
             children: checkboxValues.keys.map((key) {
               return CheckboxListTile(
-                title: Text(key),
+                title:
+                    Text(checkboxDisplayNames[key] ?? key), // Proper map access
                 value: checkboxValues[key],
                 onChanged: (value) {
                   setState(() {
