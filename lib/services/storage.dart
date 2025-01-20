@@ -34,7 +34,9 @@ class StorageService {
 
       // Check if the 'images' directory exists, if not, create it
       if (!await imagesDir.exists()) {
-        await imagesDir.create(recursive: true);  // recursive: true creates parent directories if needed
+        await imagesDir.create(
+            recursive:
+                true); // recursive: true creates parent directories if needed
         print("Created 'images' directory: ${imagesDir.path}");
       }
 
@@ -57,7 +59,6 @@ class StorageService {
     }
   }
 
-
   Future<void> saveBusinessCard(BusinessCardModel card, File imageFile) async {
     try {
       final imagePath = await saveImage(imageFile);
@@ -76,6 +77,7 @@ class StorageService {
         imageFilePath: imagePath,
         dateTime: DateTime.now().toIso8601String(),
         example: card.example,
+        selectedFields: card.selectedFields, // Include selectedFields here
       );
       SharedPreferences prefs = await SharedPreferences.getInstance();
       String cardData = jsonEncode(newCard.toJson());
@@ -128,9 +130,9 @@ class StorageService {
     try {
       List<BusinessCardModel> ls = await getAllBusinessCards();
 
-     final index =  ls.indexWhere((item) => item.id == newCard.id);
-     ls[index] = newCard;
-     SharedPreferences prefs = await SharedPreferences.getInstance();
+      final index = ls.indexWhere((item) => item.id == newCard.id);
+      ls[index] = newCard;
+      SharedPreferences prefs = await SharedPreferences.getInstance();
 
       await prefs.setStringList(
           businessCardKey, businessCardModelListToString(ls));

@@ -22,6 +22,7 @@ class DetailsScreen extends StatefulWidget {
 
 class _DetailsScreenState extends State<DetailsScreen> {
   late Map<String, String> editableFields;
+  late Map<String, bool> checkboxValues;
   Map<String, String> fieldPlaceholders = {};
   Map<String, TextEditingController> controllers = {};
   String? editingField; // Keeps track of the currently editing field
@@ -40,6 +41,11 @@ class _DetailsScreenState extends State<DetailsScreen> {
       'Website': widget.businessCard.website,
       'Address': widget.businessCard.address,
       "Example": widget.businessCard.example,
+    };
+
+    checkboxValues = {
+      for (var key in editableFields.keys)
+        key: widget.businessCard.selectedFields.contains(key),
     };
 
     editableFields.forEach((key, value) {
@@ -70,6 +76,11 @@ class _DetailsScreenState extends State<DetailsScreen> {
   Future<void> saveChanges() async {
     if (!hasChanges) return;
 
+    final selectedFields = checkboxValues.entries
+        .where((entry) => entry.value)
+        .map((entry) => entry.key)
+        .toList();
+
     try {
       final updatedCard = BusinessCardModel(
         id: widget.businessCard.id,
@@ -86,6 +97,8 @@ class _DetailsScreenState extends State<DetailsScreen> {
             widget.isFromHistory ? widget.businessCard.imageFilePath ?? '' : "",
         dateTime: DateTime.now().toIso8601String(),
         example: controllers["Example"]!.text,
+
+        selectedFields: selectedFields, // Save selected fields
       );
 
       if (widget.isFromHistory) {
@@ -128,6 +141,7 @@ class _DetailsScreenState extends State<DetailsScreen> {
           children: [
             _buildImageSection(),
             _buildDetailsSection(),
+            _buildCheckboxSection(),
           ],
         ),
       ),
@@ -244,6 +258,38 @@ class _DetailsScreenState extends State<DetailsScreen> {
                   ),
           ],
         ),
+      ),
+    );
+  }
+
+  Widget _buildCheckboxSection() {
+    return Container(
+      margin: EdgeInsets.symmetric(horizontal: 16, vertical: 20),
+      child: Column(
+        crossAxisAlignment: CrossAxisAlignment.start,
+        children: [
+          Text(
+            'Select Fields:',
+            style: TextStyle(
+              fontSize: 18,
+              fontWeight: FontWeight.bold,
+            ),
+          ),
+          SizedBox(height: 10),
+          Column(
+            children: checkboxValues.keys.map((key) {
+              return CheckboxListTile(
+                title: Text(key),
+                value: checkboxValues[key],
+                onChanged: (value) {
+                  setState(() {
+                    checkboxValues[key] = value ?? false;
+                  });
+                },
+              );
+            }).toList(),
+          ),
+        ],
       ),
     );
   }

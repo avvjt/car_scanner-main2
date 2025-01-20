@@ -91,66 +91,72 @@ class _HistoryScreenState extends State<HistoryScreen> {
         },
         child: Padding(
           padding: EdgeInsets.all(12),
-          child: Row(
+          child: Column(
+            crossAxisAlignment: CrossAxisAlignment.start,
             children: [
-              // Card Image
-              ClipRRect(
-                borderRadius: BorderRadius.circular(8),
-                child: Image.file(
-                  File(card.imageFilePath),
-                  width: 80,
-                  height: 80,
-                  fit: BoxFit.cover,
-                ),
-              ),
-              SizedBox(width: 16),
-              // Card Details
-              Expanded(
-                child: Column(
-                  crossAxisAlignment: CrossAxisAlignment.start,
-                  children: [
-                    Text(
-                      card.name,
-                      style: TextStyle(
-                        fontSize: 16,
-                        fontWeight: FontWeight.bold,
-                      ),
+              Row(
+                children: [
+                  // Display the card image
+                  ClipRRect(
+                    borderRadius: BorderRadius.circular(8),
+                    child: Image.file(
+                      File(card.imageFilePath),
+                      width: 80,
+                      height: 80,
+                      fit: BoxFit.cover,
                     ),
-                    if (card.position.isNotEmpty) ...[
-                      SizedBox(height: 4),
-                      Text(
-                        card.position,
-                        style: TextStyle(
-                          fontSize: 14,
-                          color: Colors.grey[600],
+                  ),
+                  SizedBox(width: 16),
+                  // Display basic card details (name, position, company)
+                  Expanded(
+                    child: Column(
+                      crossAxisAlignment: CrossAxisAlignment.start,
+                      children: [
+                        Text(
+                          card.name,
+                          style: TextStyle(
+                            fontSize: 16,
+                            fontWeight: FontWeight.bold,
+                          ),
                         ),
-                      ),
-                    ],
-                    if (card.company.isNotEmpty) ...[
-                      SizedBox(height: 4),
-                      Text(
-                        card.company,
-                        style: TextStyle(fontSize: 14),
-                      ),
-                    ],
-                    SizedBox(height: 4),
-                    Text(
-                      'Added: ${_formatDate(DateTime.parse(card.dateTime))}',
-                      style: TextStyle(
-                        fontSize: 12,
-                        color: Colors.grey[500],
-                      ),
+                        if (card.position.isNotEmpty)
+                          Text(
+                            card.position,
+                            style: TextStyle(fontSize: 14, color: Colors.grey),
+                          ),
+                        if (card.company.isNotEmpty)
+                          Text(
+                            card.company,
+                            style: TextStyle(fontSize: 14),
+                          ),
+                      ],
                     ),
-                  ],
+                  ),
+                  // Delete button
+                  IconButton(
+                    icon: Icon(Icons.delete_outline, color: Colors.black),
+                    onPressed: () {
+                      _showDeleteConfirmation(context, card);
+                    },
+                  ),
+                ],
+              ),
+              SizedBox(height: 8),
+              // Display selected fields as chips (if any)
+              if (card.selectedFields.isNotEmpty)
+                Wrap(
+                  spacing: 8,
+                  children: card.selectedFields
+                      .map(
+                        (field) => Chip(
+                          label: Text(
+                            field,
+                            style: TextStyle(fontSize: 12),
+                          ),
+                        ),
+                      )
+                      .toList(),
                 ),
-              ),
-              // Delete Button
-              IconButton(
-                icon: Icon(Icons.delete_outline, color: Colors.black),
-                onPressed: () {
-                  _showDeleteConfirmation(context, card);
-                },
-              ),
             ],
           ),
         ),

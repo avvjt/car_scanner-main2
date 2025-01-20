@@ -1,6 +1,7 @@
 import 'dart:convert';
 
-List<String> businessCardModelListToString(List<BusinessCardModel> data) => List<String>.from(data.map((x) => json.encode(x.toJson())));
+List<String> businessCardModelListToString(List<BusinessCardModel> data) =>
+    List<String>.from(data.map((x) => json.encode(x.toJson())));
 
 class BusinessCardModel {
   final String id;
@@ -17,6 +18,9 @@ class BusinessCardModel {
   final String imageFilePath;
   final String dateTime;
 
+  // New field to store selected fields
+  final List<String> selectedFields;
+
   BusinessCardModel({
     this.id = "",
     required this.name,
@@ -31,6 +35,7 @@ class BusinessCardModel {
     required this.example,
     required this.imageFilePath,
     required this.dateTime,
+    this.selectedFields = const [],
   });
 
   factory BusinessCardModel.fromText(
@@ -186,6 +191,9 @@ class BusinessCardModel {
         example: json["example"] ?? " ",
         imageFilePath: json["image_file_path"] ?? " ",
         dateTime: json["date_time"] ?? " ",
+        selectedFields: json["selected_fields"] != null
+            ? List<String>.from(json["selected_fields"].map((x) => x))
+            : [],
       );
 
   Map<String, dynamic> toJson() => {
@@ -202,5 +210,6 @@ class BusinessCardModel {
         "image_file_path": imageFilePath,
         "date_time": dateTime,
         "id": id,
+        "selected_fields": List<dynamic>.from(selectedFields.map((x) => x)),
       };
 }
