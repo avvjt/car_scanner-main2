@@ -3,27 +3,60 @@ import 'dart:convert';
 import 'package:card_scanner/models/business_card_model.dart';
 import 'package:path_provider/path_provider.dart';
 import 'dart:io';
-import 'package:path/path.dart' as path;
 import 'package:shared_preferences/shared_preferences.dart';
 import 'package:uuid/uuid.dart';
 
 class StorageService {
   static const String businessCardKey = "business_card_data";
+  // Future<String> saveImage(File imageFile) async {
+  //   try {
+  //     final appDir = await getTemporaryDirectory();
+  //     final fileName = 'card_${DateTime.now().millisecondsSinceEpoch}.jpg';
+  //     final imagePath = path.join(appDir.path, 'images', fileName);
+  //
+  //     // Create copy of the image in app directory
+  //     await imageFile.copy(imagePath);
+  //
+  //     return imagePath;
+  //   } catch (e) {
+  //     print('Error saving image: $e');
+  //     throw Exception('Failed to save image');
+  //   }
+  // }
+
   Future<String> saveImage(File imageFile) async {
     try {
-      final appDir = await getApplicationDocumentsDirectory();
+      // Get the cache directory for your app
+      final cacheDir = await getTemporaryDirectory();
       final fileName = 'card_${DateTime.now().millisecondsSinceEpoch}.jpg';
-      final imagePath = path.join(appDir.path, 'images', fileName);
+      // Define the target subdirectory 'images'
+      final imagesDir = Directory('${cacheDir.path}/images');
 
-      // Create copy of the image in app directory
-      await imageFile.copy(imagePath);
+      // Check if the 'images' directory exists, if not, create it
+      if (!await imagesDir.exists()) {
+        await imagesDir.create(recursive: true);  // recursive: true creates parent directories if needed
+        print("Created 'images' directory: ${imagesDir.path}");
+      }
 
-      return imagePath;
+      // Define the full destination path for the image
+      final destinationPath = '${imagesDir.path}/$fileName';
+      // Read the source file
+      final sourceFile = File(imageFile.path);
+
+      // If the source file exists, copy it to the destination
+      if (await sourceFile.exists()) {
+        await sourceFile.copy(destinationPath);
+        return destinationPath;
+      } else {
+        print('Source file not found: ${imageFile.path}');
+        throw 'Source file not found';
+      }
     } catch (e) {
       print('Error saving image: $e');
-      throw Exception('Failed to save image');
+      rethrow;
     }
   }
+
 
   Future<void> saveBusinessCard(BusinessCardModel card, File imageFile) async {
     try {

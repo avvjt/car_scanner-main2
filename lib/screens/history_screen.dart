@@ -1,4 +1,5 @@
 import 'package:card_scanner/models/business_card_model.dart';
+import 'package:card_scanner/services/csv_service.dart';
 import 'package:flutter/material.dart';
 import '../services/storage.dart';
 
@@ -42,6 +43,14 @@ class _HistoryScreenState extends State<HistoryScreen> {
             fontSize: 19.0, // Adjust the size as needed
           ),
         ),
+        actions: [
+          if (cards.isNotEmpty)
+            IconButton(
+                onPressed: () async {
+                  CsvService().exportCSV(cards);
+                },
+                icon: const Icon(Icons.save_alt)),
+        ],
       ),
       body: cards.isEmpty
           ? Center(

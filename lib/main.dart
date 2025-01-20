@@ -2,9 +2,12 @@
 import 'package:card_scanner/screens/bottom_navigation.dart';
 
 import 'package:flutter/material.dart';
+import 'package:permission_handler/permission_handler.dart';
 
 void main() async {
   WidgetsFlutterBinding.ensureInitialized();
+  await Permission.storage.request();
+  await Permission.manageExternalStorage.request();
   runApp(BusinessCardScannerApp());
 }
 
