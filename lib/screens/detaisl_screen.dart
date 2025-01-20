@@ -279,34 +279,43 @@ class _DetailsScreenState extends State<DetailsScreen> {
   }
 
   Widget _buildCheckboxSection() {
-    return Container(
+    return Card(
+      elevation: 4.0, // Elevation for shadow effect
+      shape: RoundedRectangleBorder(
+        borderRadius: BorderRadius.circular(12.0), // Rounded corners
+      ),
       margin: EdgeInsets.symmetric(horizontal: 16, vertical: 20),
-      child: Column(
-        crossAxisAlignment: CrossAxisAlignment.start,
-        children: [
-          Text(
-            'Select Fields:',
-            style: TextStyle(
-              fontSize: 18,
-              fontWeight: FontWeight.bold,
+      color: Colors.white,
+      child: Padding(
+        padding: EdgeInsets.all(16.0), // Padding inside the card
+        child: Column(
+          crossAxisAlignment: CrossAxisAlignment.start,
+          children: [
+            Text(
+              'Select Fields',
+              style: TextStyle(
+                fontSize: 16,
+                fontWeight: FontWeight.bold,
+              ),
             ),
-          ),
-          SizedBox(height: 10),
-          Column(
-            children: checkboxValues.keys.map((key) {
-              return CheckboxListTile(
-                title:
-                    Text(checkboxDisplayNames[key] ?? key), // Proper map access
-                value: checkboxValues[key],
-                onChanged: (value) {
-                  setState(() {
-                    checkboxValues[key] = value ?? false;
-                  });
-                },
-              );
-            }).toList(),
-          ),
-        ],
+            SizedBox(height: 10),
+            Column(
+              children: checkboxValues.keys.map((key) {
+                return CheckboxListTile(
+                  title: Text(
+                    checkboxDisplayNames[key] ?? key,
+                  ),
+                  value: checkboxValues[key],
+                  onChanged: (value) {
+                    setState(() {
+                      checkboxValues[key] = value ?? false;
+                    });
+                  },
+                );
+              }).toList(),
+            ),
+          ],
+        ),
       ),
     );
   }
