@@ -2,6 +2,7 @@ import 'package:card_scanner/models/business_card_model.dart';
 import 'package:card_scanner/services/csv_service.dart';
 import 'package:flutter/material.dart';
 import '../services/storage.dart';
+import 'package:card_scanner/models/constants.dart';
 
 import 'dart:io';
 
@@ -142,7 +143,6 @@ class _HistoryScreenState extends State<HistoryScreen> {
                 ],
               ),
               SizedBox(height: 8),
-              // Display selected fields as chips (if any)
               if (card.selectedFields.isNotEmpty)
                 Wrap(
                   spacing: 8,
@@ -150,14 +150,14 @@ class _HistoryScreenState extends State<HistoryScreen> {
                       .map(
                         (field) => Chip(
                           label: Text(
-                            field,
+                            checkboxDisplayNames[field] ??
+                                field, // Use global map
                             style: TextStyle(fontSize: 12),
                           ),
                         ),
                       )
                       .toList(),
                 ),
-
               SizedBox(height: 4),
               Text(
                 'Created: ${_formatDate(DateTime.parse(card.dateTime))}',
